@@ -31,17 +31,17 @@ test.only("Search Courses", async ({ page }) => {
 
         // ตรวจสอบว่าพบผลลัพธ์การค้นหาหรือไม่
         if (elementHandle) {
-            const DataPagesearch_course = await elementHandle.textContent(); // ดึงข้อความจากองค์ประกอบ
+            const DataPagesearch_course = await elementHandle.textContent(); 
             if (DataPagesearch_course.includes(DataPageResult)) {
-                console.log(`Row ${row}: True`);
-                worksheet.getCell(`E${row}`).value = 'True';
+                console.log(`Row ${row}: Pass`);
+                worksheet.getCell(`E${row}`).value = 'Pass';
             } else {
-                console.log(`Row ${row}: False`);
-                worksheet.getCell(`E${row}`).value = 'False';
+                console.log(`Row ${row}: Fail`);
+                worksheet.getCell(`E${row}`).value = 'Fail';
             }
         } else {
-            console.log(`Row ${row}: False - No search result found`);
-            worksheet.getCell(`E${row}`).value = 'False'; // กรณีที่ไม่พบผลลัพธ์การค้นหา
+            console.log(`Row ${row}: Fail - No search result found`);
+            worksheet.getCell(`E${row}`).value = 'Fail'; // กรณีที่ไม่พบผลลัพธ์การค้นหา
         }
 
         row++; // ไปยังแถวถัดไป

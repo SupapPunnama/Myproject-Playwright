@@ -2,7 +2,7 @@ const { test: user } = require('@playwright/test');
 const user_ExcelJS = require('exceljs');
 
 user.only("Login Member user", async ({ page }) => {
-    user.setTimeout(120000); // Increase the overall test timeout
+    user.setTimeout(120000); 
 
     const workbook = new user_ExcelJS.Workbook();
     await workbook.xlsx.readFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\03_Data_Loginmember.xlsx");
@@ -39,12 +39,12 @@ user.only("Login Member user", async ({ page }) => {
         const currentUrl = page.url();
         if (currentUrl === 'http://localhost:8083/sci_mju_lifelonglearning/') {
             console.log('เข้าสู่ระบบสำเร็จ');
-            worksheet.getCell(`F${row}`).value = 'Teue';
+            worksheet.getCell(`F${row}`).value = 'Pass';
             await page.click('a[href="/sci_mju_lifelonglearning/doLogout"]');  
             await page.goto('http://localhost:8083/sci_mju_lifelonglearning/loginMember', { waitUntil: 'domcontentloaded' });  
         } else {
             console.log('เข้าสู่ระบบไม่สำเร็จ');
-            worksheet.getCell(`F${row}`).value = 'False';
+            worksheet.getCell(`F${row}`).value = 'Fail';
             await page.goto('http://localhost:8083/sci_mju_lifelonglearning/loginMember', { waitUntil: 'domcontentloaded' });  
         }
         row++; 

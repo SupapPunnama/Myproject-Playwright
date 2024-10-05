@@ -155,18 +155,18 @@ RegisterCourse.only("Register Courses Test", async ({ page }) => {
             const invalidPassword = await page.textContent('#invalidPassword');
             const passwordMatchMessage = await page.textContent('#passwordMatchMessage');
 
-            if (status.trim() === "บัญชีนี้ใช้งานได้" && passwordMatchMessage.trim() === "Passwords match." && !invalidBirthday.trim()
+            if (passwordMatchMessage.trim() !== "Passwords do not match." && status.trim() === "บัญชีนี้ใช้งานได้" &&  !invalidBirthday.trim()
                 && !invalidTel.trim() && !invalidEducation.trim() && !invalidPassword.trim()) {
                 console.log('บันทึกสำเร็จ');
                 worksheet.getCell(`O${row}`).value = 'บันทึกสำเร็จ';
             } else {
                 console.log('ข้อผิดพลาดหน้า 2:', invalidBirthday, invalidTel, invalidEducation, status, invalidPassword, passwordMatchMessage);
-                worksheet.getCell(`V${row}`).value = invalidBirthday || invalidTel || invalidEducation || status || invalidPassword || passwordMatchMessage || 'ข้อผิดพลาดไม่รู้จัก';
+                worksheet.getCell(`O${row}`).value = invalidBirthday || invalidTel || invalidEducation || status || invalidPassword || passwordMatchMessage || 'ข้อผิดพลาดไม่รู้จัก';
             }
 
         } else {
             console.log('ข้อผิดพลาดหน้า 1:', invalidIdCard, invalidFirstname, invalidLastName, invalidGender, invalidEmail);
-            worksheet.getCell(`V${row}`).value = invalidIdCard || invalidFirstname || invalidLastName || invalidGender || invalidEmail || 'ข้อผิดพลาดไม่รู้จัก';
+            worksheet.getCell(`O${row}`).value = invalidIdCard || invalidFirstname || invalidLastName || invalidGender || invalidEmail || 'ข้อผิดพลาดไม่รู้จัก';
 
         }
 
