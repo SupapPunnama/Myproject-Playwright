@@ -1,9 +1,11 @@
-const { test } = require('@playwright/test');
-const test_ExcelJS = require('exceljs');
+import { connect } from "http2";
 
-test.only("Search Courses", async ({ page }) => {
-    const workbook = new test_ExcelJS.Workbook();
-    test.setTimeout(250000);
+const { test : search_course } = require('@playwright/test');
+const search_course_ExcelJS = require('exceljs');
+
+search_course.only("Search Courses", async ({ page }) => {
+    const workbook = new search_course_ExcelJS.Workbook();
+    search_course.setTimeout(250000);
     await workbook.xlsx.readFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\01_Data_Search_Course.xlsx");
     const worksheet = workbook.getWorksheet(1);
 
@@ -14,7 +16,7 @@ test.only("Search Courses", async ({ page }) => {
 
     let row = 2; 
     let round = 0; 
-    while (row <= 6) {  // ปรับเป็นทำงานตั้งแต่แถว 2 ถึงแถว 6
+    while (row <= 6) { 
 
         await page.reload();
 
@@ -40,12 +42,13 @@ test.only("Search Courses", async ({ page }) => {
                 worksheet.getCell(`E${row}`).value = 'Fail';
             }
         } else {
-            console.log(`Row ${row}: Fail - No search result found`);
-            worksheet.getCell(`E${row}`).value = 'Fail'; // กรณีที่ไม่พบผลลัพธ์การค้นหา
+            console.log(`Row ${row}: Fail - No search result`);
+            worksheet.getCell(`E${row}`).value = 'Fail'; 
         }
 
-        row++; // ไปยังแถวถัดไป
-        round++; // เพิ่มตัวนับรอบ
+        row++; 
+        round++; 
+        continue;
     }
 
     await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\01_Data_Search_Course.xlsx");

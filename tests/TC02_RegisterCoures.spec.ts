@@ -12,11 +12,11 @@ RegisterCourse.only("Register Courses Test", async ({ page }) => {
 
     const worksheet = workbook.getWorksheet(1);
 
-    let row = 2; // เริ่มต้นที่แถวที่ 2
-    let round = 0; // ตั้งค่าตัวนับรอบ
+    let row = 2; 
+    let round = 0; 
 
-    while (round <= 71) { // 71 รอบ
-        const processFlag = worksheet.getCell(`Q${row}`).value; // ตรวจสอบค่าในเซลล์ Q{row}
+    while (round <= 71) { 
+        const processFlag = worksheet.getCell(`Q${row}`).value; 
         console.log(processFlag);
 
         if (processFlag !== 'Yes') {
@@ -80,10 +80,9 @@ RegisterCourse.only("Register Courses Test", async ({ page }) => {
         const invalidEmail = await page.textContent('#invalidEmail');
 
         if (!invalidIdCard.trim() && !invalidFirstname.trim() && !invalidLastName.trim() && !invalidGender.trim() && !invalidEmail.trim()) {
-            // ฟิลด์ทั้งหมดถูกต้อง ดำเนินการไปยังส่วนถัดไป
             console.log('ฟิลด์ทั้งหมดถูกต้อง ดำเนินการต่อ');
-
-            const birthdayCellValue = worksheet.getCell(`G${row}`).value; // วันเกิด Start หน้าที่ 2
+            
+            const birthdayCellValue = worksheet.getCell(`G${row}`).value; // วันเกิด 
             if (birthdayCellValue) {
                 try {
                     const dateParts = birthdayCellValue.split('/');
@@ -175,8 +174,8 @@ RegisterCourse.only("Register Courses Test", async ({ page }) => {
         worksheet.getCell(`P${row}`).value = valueM === valueO ? 'Pass' : 'Fail';
         await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\02_Data_Register.xlsx");
 
-        row++; // ไปยังแถวถัดไป
-        round++; // เพิ่มตัวนับรอบ
+        row++; 
+        round++; 
         continue;
     }
     await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\02_Data_Register.xlsx");
