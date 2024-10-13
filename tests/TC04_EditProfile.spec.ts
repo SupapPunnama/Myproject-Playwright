@@ -2,7 +2,7 @@ const { test: Edit_Profile, expect } = require('@playwright/test');
 const ExcelJS2 = require('exceljs');
 
 Edit_Profile.only("Edit Profile", async ({ page }) => {
-    Edit_Profile.setTimeout(2000000); // Set test timeout to a higher value
+    Edit_Profile.setTimeout(2000000); 
 
     const workbook = new ExcelJS2.Workbook();
     await workbook.xlsx.readFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\04_Data_EditProfile.xlsx");
@@ -25,10 +25,9 @@ Edit_Profile.only("Edit Profile", async ({ page }) => {
     ]);
 
     const worksheet = workbook.getWorksheet(1);
-    let row = 2; // Start at row 2
+    let row = 2; 
     let round = 0;
 
-    // Handle dialogs globally
     page.on('dialog', async dialog => {
         const alertMessage = dialog.message();
         console.log('Alert message:', alertMessage);
@@ -36,19 +35,17 @@ Edit_Profile.only("Edit Profile", async ({ page }) => {
 
         await dialog.accept();
 
-        // Compare cell H and J, then store True or False in K
         const cellH = worksheet.getCell(`H${row}`).value;
         const cellJ = worksheet.getCell(`J${row}`).value;
-        worksheet.getCell(`K${row}`).value = cellH === cellJ ? 'True' : 'False';
-
-        // Save Excel changes
+        worksheet.getCell(`K${row}`).value = cellH === cellJ ? 'Pass' : 'Fail';
         await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\04_Data_EditProfile.xlsx");
 
-        row++; // Move to the next row after handling the dialog
+        row++; 
         round++;
+        
     });
 
-    while (round <= 45) { // Loop 45 rounds
+    while (round <= 45) { 
         const processFlag = worksheet.getCell(`L${row}`).value; // ตรวจสอบค่าในเซลล์ L{row}
         console.log(processFlag);
 
@@ -121,7 +118,7 @@ Edit_Profile.only("Edit Profile", async ({ page }) => {
         await nextButton.scrollIntoViewIfNeeded();
         await nextButton.click();
 
-        // Short wait for any possible dialog to appear
+        
         await page.waitForTimeout(2000);
 
         console.log('บันทึกสำเร็จ');
@@ -129,13 +126,14 @@ Edit_Profile.only("Edit Profile", async ({ page }) => {
 
         const cellH = worksheet.getCell(`H${row}`).value;
         const cellJ = worksheet.getCell(`J${row}`).value;
-        worksheet.getCell(`K${row}`).value = cellH === cellJ ? 'True' : 'False';
+        worksheet.getCell(`K${row}`).value = cellH === cellJ ? 'Pass' : 'Fail';
 
-        // Save Excel changes
+     
         await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\04_Data_EditProfile.xlsx");
 
         row++;
         round++;
+        continue;
     }
 
     await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\04_Data_EditProfile.xlsx");

@@ -21,7 +21,7 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
     const submit = await page.$("//input[@type='submit' and @value='เข้าสู่ระบบ']");
     await submit.scrollIntoViewIfNeeded();
     await submit.click();
-    
+
     await page.goto('http://localhost:8083/sci_mju_lifelonglearning/course/C003/edit_course');
 
 
@@ -33,7 +33,7 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
 
         const processFlag = worksheet.getCell(`X${row}`).value; // ตรวจสอบค่าในเซลล์ X{row}
         console.log(processFlag);
-        
+
         if (processFlag !== 'Yes') {
             row++;
             round++;
@@ -42,21 +42,26 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
 
         await page.reload();
 
+
         const course_type = worksheet.getCell(`B${row}`).value; // ประเภทหลักสูตร
         if (course_type) {
+            // รอให้ select element ปรากฏ
             await page.waitForSelector('#course_type', { visible: true });
-            const optionValues = await page.$$eval('#course_type option', options =>
-                options.map(option => option.textContent?.trim() || '')
-            );
+            // ตรวจสอบว่ามี option ที่ตรงกับ course_type หรือไม่
+            const optionExists = await page.$eval('#course_type', (select, course_type) => {
+                return Array.from(select.options).some(option =>
+                    (option as HTMLOptionElement).textContent?.trim() === course_type.trim()
+                );
+            }, course_type);
 
-            if (optionValues.includes(course_type.trim())) {
+            if (optionExists) {
+                // ถ้ามี option ที่ตรงกัน ให้เลือก option นั้น
                 await page.selectOption('#course_type', { label: course_type.trim() });
-            } else {    
+            } else {
                 console.log(`ตัวเลือก '${course_type}' ไม่มีในรายการ`);
             }
         }
 
- 
         const major_id = worksheet.getCell(`C${row}`).value; // สาขา
         if (major_id) {
             await page.waitForSelector('#major_id', { visible: true });
@@ -71,7 +76,7 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
             }
         }
 
-  
+
         const course_name = worksheet.getCell(`D${row}`).value; // ชื่อหลักสูตร
         if (course_name) {
             await page.waitForSelector('#course_name', { visible: true });
@@ -80,34 +85,34 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
             await page.click('a#link');
         }
 
-      
+
         const certificateName = worksheet.getCell(`E${row}`).value; // ชื่อเกียรติบัตร
         if (certificateName) {
             await page.waitForSelector('#certificateName', { visible: true });
             await page.fill('#certificateName', certificateName.toString());
         }
 
-  
+
         const course_img = worksheet.getCell(`F${row}`).value; // รูปภาพหลักสูตร
         if (course_img) {
             await page.waitForSelector('#fileInput', { visible: true });
             await page.setInputFiles('#fileInput', course_img.toString());
 
-                    // รออะเลิท 3 วินาที
-             try {
-                 const alertMessage = await page.waitForEvent('dialog', { timeout: 3000 });
-                        console.log(`พบอะเลิท: ${alertMessage.message()}`);
-                        worksheet.getCell(`V${row}`).value = alertMessage.message(); 
-                        await alertMessage.accept(); 
-                                    
+            // รออะเลิท 3 วินาที
+            try {
+                const alertMessage = await page.waitForEvent('dialog', { timeout: 3000 });
+                console.log(`พบอะเลิท: ${alertMessage.message()}`);
+                worksheet.getCell(`V${row}`).value = alertMessage.message();
+                await alertMessage.accept();
+
                 row++;
                 round++;
                 continue;
-                
-                } catch (error) {
-                        console.log('ไม่มีอะเลิท');
-                }
-    
+
+            } catch (error) {
+                console.log('ไม่มีอะเลิท');
+            }
+
         }
 
         const course_principle = worksheet.getCell(`G${row}`).value; // หลักการและเหตุผล
@@ -128,8 +133,8 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
         const invalidImg = await page.textContent('#invalidImg');
         const invalidPrinciple = await page.textContent('#invalidPrinciple');
 
-        if(status.trim() === "สามารถใช้งานได้" && !invalidCourseType.trim() && !invalidMajor.trim() && !invalidCertificateName.trim()
-            && !invalidImg.trim() && !invalidPrinciple.trim()){
+        if (status.trim() === "สามารถใช้งานได้" && !invalidCourseType.trim() && !invalidMajor.trim() && !invalidCertificateName.trim()
+            && !invalidImg.trim() && !invalidPrinciple.trim()) {
             console.log('ฟิลด์ทั้งหมดถูกต้อง ดำเนินการต่อหน้า 2');
 
             const course_object = worksheet.getCell(`H${row}`).value; // วัตถุประสงค์
@@ -151,16 +156,16 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
                     if (await CallFeeRadioButton.count() > 0) {
                         await CallFeeRadioButton.first().check();
 
-                            const course_fee = worksheet.getCell(`J${row}`).value; // จำนวนเงิน
-                            if (course_fee) {
-                             const validCourseFee = course_fee.toString().replace(/\D/g, ''); // ลบอักขระที่ไม่ใช่ตัวเลข
+                        const course_fee = worksheet.getCell(`J${row}`).value; // จำนวนเงิน
+                        if (course_fee) {
+                            const validCourseFee = course_fee.toString().replace(/\D/g, ''); // ลบอักขระที่ไม่ใช่ตัวเลข
                             if (validCourseFee) {
-                            await page.waitForSelector('#course_fee', { visible: true });
-                            await page.fill('#course_fee', validCourseFee);
-                             } else {
+                                await page.waitForSelector('#course_fee', { visible: true });
+                                await page.fill('#course_fee', validCourseFee);
+                            } else {
                                 console.log(`ค่าธรรมเนียมที่ไม่ถูกต้องในแถว ${row}`);
                             }
-                            }
+                        }
 
                     }
                 }
@@ -169,7 +174,7 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
             if (course_totalHours) {
                 // ลบอักขระที่ไม่ใช่ตัวเลขเพื่อให้เข้ากับ input[type=number]
                 const validtotalHours = course_totalHours.toString().replace(/\D/g, ''); // ลบตัวอักษรที่ไม่ใช่ตัวเลข
-                if(validtotalHours) {
+                if (validtotalHours) {
                     await page.waitForSelector('#course_totalHours', { visible: true });
                     await page.fill('#course_totalHours', validtotalHours); // กรอกข้อมูลที่เป็นตัวเลข
                 } else {
@@ -182,22 +187,22 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
                 await page.waitForSelector('#course_file', { visible: true });
                 await page.setInputFiles('#course_file', course_file.toString());
 
-            // รออะเลิท 3 วินาที
-            try {
-                const alertMessage = await page.waitForEvent('dialog', { timeout: 3000 });
-                console.log(`พบอะเลิท: ${alertMessage.message()}`);
-                worksheet.getCell(`V${row}`).value = alertMessage.message(); 
-                await alertMessage.accept(); 
+                // รออะเลิท 3 วินาที
+                try {
+                    const alertMessage = await page.waitForEvent('dialog', { timeout: 3000 });
+                    console.log(`พบอะเลิท: ${alertMessage.message()}`);
+                    worksheet.getCell(`V${row}`).value = alertMessage.message();
+                    await alertMessage.accept();
 
-                     
-                row++;
-                round++;
-                continue;
 
-            } catch (error) {
-                console.log('ไม่มีอะเลิท');
-            }
-   
+                    row++;
+                    round++;
+                    continue;
+
+                } catch (error) {
+                    console.log('ไม่มีอะเลิท');
+                }
+
             }
 
 
@@ -206,7 +211,7 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
                 await page.waitForSelector('#floatingTextarea3', { visible: true });
                 await page.fill('#floatingTextarea3', floatingTextarea3.toString());
             }
-       
+
             const nextBtn = await page.$('#nextBtn');
             await nextBtn.scrollIntoViewIfNeeded();
             await nextBtn.click();
@@ -217,8 +222,8 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
             const invalidCourseFile = await page.textContent('#invalidCourseFile');
             const invalidCourseTargetOccupation = await page.textContent('#invalidCourseTargetOccupation');
 
-            if(!invalidObjective.trim() && !invalidCourseFee.trim() && !invalidCourseTotalHours.trim() &&!invalidCourseFile.trim() 
-                &&!invalidCourseTargetOccupation.trim()){
+            if (!invalidObjective.trim() && !invalidCourseFee.trim() && !invalidCourseTotalHours.trim() && !invalidCourseFile.trim()
+                && !invalidCourseTargetOccupation.trim()) {
                 console.log('ฟิลด์ทั้งหมดถูกต้อง ดำเนินการต่อหน้า 3');
 
                 const prefix = worksheet.getCell(`N${row}`).value; // คำนำหน้า
@@ -255,7 +260,7 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
                         console.log(`เบอร์โทรศัพท์ไม่ถูกต้องในแถว ${row}`);
                     }
                 }
-                
+
 
                 const email_contacts = worksheet.getCell(`S${row}`).value; // อีเมล
                 if (email_contacts) {
@@ -274,35 +279,35 @@ Edit_Course_Admin.only("Edit Course Admin", async ({ page }) => {
                 const invalidPhoneContacts = await page.textContent('#invalidPhoneContacts');
                 const invalidEmailContacts = await page.textContent('#invalidEmailContacts');
 
-                if(!invalidSelectPrefix.trim() && !invalidFNameContacts.trim() && !invalidLNameContacts.trim() && !invalidFaculty.trim() 
-                    && !invalidPhoneContacts.trim() && !invalidEmailContacts.trim()){
+                if (!invalidSelectPrefix.trim() && !invalidFNameContacts.trim() && !invalidLNameContacts.trim() && !invalidFaculty.trim()
+                    && !invalidPhoneContacts.trim() && !invalidEmailContacts.trim()) {
                     console.log('บันทึกสำเร็จ');
                     worksheet.getCell(`V${row}`).value = 'บันทึกสำเร็จ';
                 } else {
                     console.log('ข้อผิดพลาดหน้า 3:', invalidSelectPrefix, invalidFNameContacts, invalidLNameContacts, invalidFaculty,
                         invalidPhoneContacts, invalidEmailContacts);
                     worksheet.getCell(`V${row}`).value = invalidSelectPrefix || invalidFNameContacts || invalidLNameContacts || invalidFaculty
-                        || invalidPhoneContacts || invalidEmailContacts || 'ข้อผิดพลาดไม่รู้จัก';
+                        || invalidPhoneContacts || invalidEmailContacts || 'ข้อผิดพลาดไม่รู้จัก หน้า3';
                 }
             } else {
                 console.log('ข้อผิดพลาดหน้า 2:', invalidObjective, invalidCourseFee, invalidCourseTotalHours, invalidCourseFile, invalidCourseTargetOccupation);
-                worksheet.getCell(`V${row}`).value = invalidObjective || invalidCourseFee || invalidCourseTotalHours || invalidCourseFile 
-                    || invalidCourseTargetOccupation || 'ข้อผิดพลาดไม่รู้จัก';
+                worksheet.getCell(`V${row}`).value = invalidObjective || invalidCourseFee || invalidCourseTotalHours || invalidCourseFile
+                    || invalidCourseTargetOccupation || 'ข้อผิดพลาดไม่รู้จัก หน้า2';
             }
         } else {
             console.log('ข้อผิดพลาดหน้า 1:', invalidCourseType, invalidMajor, invalidCertificateName, invalidImg, invalidPrinciple);
-            worksheet.getCell(`V${row}`).value = invalidCourseType || invalidMajor || invalidCertificateName || invalidImg || invalidPrinciple || 'ข้อผิดพลาดไม่รู้จัก';
+            worksheet.getCell(`V${row}`).value = invalidCourseType || invalidMajor || invalidCertificateName || invalidImg || invalidPrinciple || 'ข้อผิดพลาดไม่รู้จัก หน้า1';
         }
 
 
         const cellT = worksheet.getCell(`T${row}`).value;
         const cellV = worksheet.getCell(`V${row}`).value;
-        worksheet.getCell(`W${row}`).value = cellT === cellV ? 'True' : 'False';
+        worksheet.getCell(`W${row}`).value = cellT === cellV ? 'Pass' : 'Fail';
         await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\05_Data_AddCoures_Admin.xlsx");
 
         row++;
         round++;
         continue;
     }
-    await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\06_Data_Edit_Coures_Admin.xlsx"); 
+    await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\06_Data_Edit_Coures_Admin.xlsx");
 });

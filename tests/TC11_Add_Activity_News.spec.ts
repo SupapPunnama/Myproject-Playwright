@@ -101,10 +101,10 @@ Add_Activity_News.only("Add Activity News", async ({ page }) => {
             const valueG = worksheet.getCell(`G${row}`).value;
             if (valueE === valueG) {
                 console.log(`Row ${row}: True`);
-                worksheet.getCell(`H${row}`).value = 'True';
+                worksheet.getCell(`H${row}`).value = 'Pass';
             } else {
                 console.log(`Row ${row}: False`);
-                worksheet.getCell(`H${row}`).value = 'False';
+                worksheet.getCell(`H${row}`).value = 'Fail';
             }
 
             await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\11_Data_Add_Activity_News.xlsx");

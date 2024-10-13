@@ -52,12 +52,11 @@ Lecturer.only("Login Member user", async ({ page }) => {
         const valueG = worksheet.getCell(`G${row}`).value;
             if (valueF === valueG) {
                 console.log(`Row ${row}: True`);
-                worksheet.getCell(`H${row}`).value = 'True';
+                worksheet.getCell(`H${row}`).value = 'Pass';
             } else {
                 console.log(`Row ${row}: False`);
-                worksheet.getCell(`H${row}`).value = 'False';
+                worksheet.getCell(`H${row}`).value = 'Fail';
             }
-        // Save 
         await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\07_Data_Login_Lecturer.xlsx");
         await page.waitForTimeout(1000);
 

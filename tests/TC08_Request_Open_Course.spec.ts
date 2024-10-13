@@ -348,12 +348,9 @@ Request_open_course.only("Request open course", async ({ page }) => {
 
                     }
                 }
-
                 const submitButton = await page.$('#nextBtn');
                 await submitButton.scrollIntoViewIfNeeded();
                 await submitButton.click();
-
-
 
                 // ตรวจสอบฟิลด์เพิ่มเติม
                 const invalidTypeTeach = await page.textContent('#invalidTypeTeach');
@@ -367,16 +364,15 @@ Request_open_course.only("Request open course", async ({ page }) => {
 
                 } else {
                     console.log('ข้อผิดพลาดหน้า 3:', invalidTypeTeach, invalidTypeLearn, invalidLinkMooc, invalidLocation);
-                    worksheet.getCell(`U${row}`).value = invalidTypeTeach || invalidTypeLearn || invalidLinkMooc || invalidLocation || 'ข้อผิดพลาดไม่รู้จัก';
+                    worksheet.getCell(`U${row}`).value = invalidTypeTeach || invalidTypeLearn || invalidLinkMooc || invalidLocation || 'ข้อผิดพลาดไม่รู้จัก หน้า3';
 
                 }
-
-
+                
             } else {
                 console.log('ข้อผิดพลาดหน้า 2:', invalid_chk_mo, invalid_chk_tu, invalid_chk_we, invalid_chk_th, invalid_chk_fr, invalid_chk_sa,
                     invalid_chk_su, invalidStartStudyDate, invalidEndStudyDate);
                 worksheet.getCell(`U${row}`).value = invalid_chk_mo || invalid_chk_tu || invalid_chk_we || invalid_chk_th || invalid_chk_fr ||
-                    invalid_chk_sa || invalid_chk_su || invalidStartStudyDate || invalidEndStudyDate || 'ข้อผิดพลาดไม่รู้จัก';
+                    invalid_chk_sa || invalid_chk_su || invalidStartStudyDate || invalidEndStudyDate || 'ข้อผิดพลาดไม่รู้จัก หน้า2';
             }
 
 
@@ -384,13 +380,13 @@ Request_open_course.only("Request open course", async ({ page }) => {
             console.log('ข้อผิดพลาดหน้า 1:', invalidCourse_Select, invalidStartRegister, invalidEndRegister, invalidQuantity,
                 invalidStartPayment, invalidEndPayment, invalidApplicationResult);
             worksheet.getCell(`U${row}`).value = invalidCourse_Select || invalidStartRegister || invalidEndRegister || invalidQuantity
-            invalidStartPayment || invalidEndPayment || invalidApplicationResult || 'ข้อผิดพลาดไม่รู้จัก';
+            invalidStartPayment || invalidEndPayment || invalidApplicationResult || 'ข้อผิดพลาดไม่รู้จัก หน้า1';
 
         }
 
         const valueS = worksheet.getCell(`S${row}`).value;
         const valueU = worksheet.getCell(`U${row}`).value;
-        worksheet.getCell(`V${row}`).value = valueS === valueU ? 'True' : 'False';
+        worksheet.getCell(`V${row}`).value = valueS === valueU ? 'Pass' : 'Fail';
         await workbook.xlsx.writeFile("C:\\Users\\Vivo\\Desktop\\Test_Project\\tests\\08_Data_Request_Open_Course.xlsx");
 
         row++;
